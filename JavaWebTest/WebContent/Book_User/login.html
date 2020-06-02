@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html class="login-alone">
+    <head>
+        <title>熊大论坛 - 登录</title>
+		
+		<meta name="description" content="熊大论坛" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+         <link href="../style/blue/screen.css?v=3.9" media="screen, projection" rel="stylesheet" type="text/css" >
+        <link rel="stylesheet" type="text/css" href="../style/blue/base.css?v=3.9">
+        <link rel="stylesheet" type="text/css" href="../style/blue/login.css?v=3.9">
+        <script type="text/javascript" src="/JavaWebTest/script/jquery.js"></script>
+    </head>
+    <body>
+     <script type="text/javascript">
+		
+		//路径获取
+		function getPath(){
+			var path = location.href;
+			var pname = location.pathname;
+			var index = path.indexOf(pname); 
+			var projectName =pname.substring(0,pname.indexOf("/", 1));
+			return path.substring(0,index)+projectName+"/";
+		}
+		$(function(){
+			$("#login").click(function(){
+				var username1=document.getElementById("username").value;
+				var password1=document.getElementById("password").value;
+				var chk=document.getElementById("chk11");
+				//alert(username);
+				var error=document.getElementById("login-error");
+				var itemForm= $('#form-login');//一次获取全部
+				$.ajax({
+					  dataType: "json",
+				      type: "post", 
+				      url:getPath()+"/LoginServlet", 
+				     // data: itemForm.serialize(),
+				      data:"username="+username1+"&password="+password1+"&chk11="+chk.value,
+				     //data:d,
+				      success: function(rs) {
+				    	//var obj = eval('(' + rs + ')');//使用json数据类型就不用转型
+						if(rs.uid!=null){
+							alert("loging="+rs.loging+",password="+rs.password+",username="+rs.username+",uid="+rs.uid); 
+							window.sessionStorage.setItem("username", rs.username);//存放数据
+							window.sessionStorage.setItem("uid", rs.uid);//存放数据
+							alert("123");
+							window.location = "http://"+location.host+"/JavaWebTest/index.html";
+							error.innHTML="";
+						}else{
+							alert("321");
+							error.innHTML="用户名或密码错误!";
+						} 
+				      }
+				});
+			});
+			function getCookie(c_name){//获取cookie
+				if(document.cookie.length>0){
+					c_start=document.cookie.indexOf(c_name+"=")
+					if(c_start!=1){
+						c_start=c_start+c_name.length+1
+						c_end=document.cookie.indexOf(";",c_start)
+						if(c_end==-1)c_end=document.cookie.length
+						return unescape(document.cookie.substring(c_start,c_end))
+					}
+				}
+				return ""
+			}
+			var login=getCookie('login');
+			if(login){
+				var index=login.indexOf('#');
+				var username=login.substring(0,index);//获取用户名
+				var pass=login.substring(index+1);//获取密码
+				$('#username').val(username);//设置账户
+				$('#password').val(pass);
+				$('#chk11').prop("checked",true);
+			}
+		});
+		
+	</script>
+        <div class="logina-logo" style="height: 55px">
+         	<a href="#"><img src="../style/blue/images/logo_max.png" class="logoImg"/></a>
+            <span class="logoText">熊大  买一本呗</span>
+        </div>
+        <div class="logina-main main clearfix">
+            <div class="tab-con">
+                <form id="form-login" method="post" action="" enctype="multipart/form-data">
+                    <div id='login-error' class="error-tip"></div>
+                    <table border="0" cellspacing="0" cellpadding="0">
+                        <tbody>
+                            <tr>
+                                <th>用户名</th>
+                                <td width="245">
+                                    <input id="username" type="text" name="username" placeholder="用户名" autocomplete="off" value=""></td>
+                                <td>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>密码</th>
+                                <td width="245">
+                                    <input id="password" type="password" name="password" placeholder="请输入密码" autocomplete="off">
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                            <tr class="find">
+                                <th></th>
+                                <td>
+                                    <div>
+                                        <label class="checkbox" for="chk11"><input style="height: auto;" id="chk11" type="checkbox" name="remember_me" value="1">记住我</label>
+                                        <a href="#">忘记密码？</a>
+                                    </div>
+                                </td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <td width="245"><input id="login" class="confirm"  type="button" value="登  录"></td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+            <div class="reg">
+                <p>还没有账号？<br>赶快免费注册一个吧！</p>
+                <a class="reg-btn" href="register.html">立即免费注册</a>
+            </div>
+        </div>
+    </body>
+</html>

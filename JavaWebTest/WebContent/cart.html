@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta name="Generator" content="YONGDA v1.0" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+
+        <title>购物车 - 熊大书城</title>
+
+        <link href="style/blue/main.css" rel="stylesheet" type="text/css" />
+        <style type="text/css">
+            table {border:1px solid #dddddd; border-collapse: collapse; width:99%; margin:auto;}
+            td {border:1px solid #dddddd;}
+            #consignee_addr {width:450px;}
+        </style>
+        <script type="text/javascript" src="/JavaWebTest/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript">
+	        function getPath(){//路径获取
+				var path = location.href;
+				var pname = location.pathname;
+				var index = path.indexOf(pname); 
+				var projectName =pname.substring(0,pname.indexOf("/", 1));
+				return path.substring(0,index)+projectName+"/";
+			};
+			var id;//存放uid
+			var msg;//存放购物车
+        	function loCart(){//获取购物信息
+        		id=window.sessionStorage.getItem("ids");//获取uid
+        		var c=0;
+        		var headHtml="<tr>"
+                    +"<th>商品名称</th>"
+                    +"<th>本店价</th>"
+                    +"<th>购买数量</th>"
+                    +"<th>小计</th>"
+                    +"<th>操作</th>"
+                +"</tr>";
+        		//var c=JSON.stringify(lists[i]);//将数组转换为字串
+				$.ajax({//将cookie提交到后台存放
+					type:"POST",
+					url:getPath()+"/GetShoppMsgServlet",
+					data:{"listsTo":c,"ids":id},
+					dataType:"json",
+					success:function(re){
+						msg=re;//保存到全局
+						var nobooks=document.getElementById("aa");
+						var meys=document.getElementById("mey");
+						var ne=headHtml;
+						var may=0;
+						for(var i=0;i<re.length;i++){
+							alert("是否删除:"+re[i].HAS);
+							if(re[i].HAS!="no"){
+								alert("BID="+re[i].BID);
+								may+=(Number(re[i].CURRPRICE)*Number(re[i].QUANTITY));//计算总价
+								ne=ne+"<tr>"
+	                            +"<td align='center'>"
+		                        +"<a href='#' target='_blank'><img style='width: 80px; height: 80px;' src=\"style/blue/images/"+re[i].IMAGE_B+"\" title='"+re[i].BNAME.split("$")[0]+"' /></a><br />"
+		                        +"<a href=''#' target='_blank' class='f6'>"+re[i].BNAME.split("$")[0]+"</a>"
+			                    +"</td>"
+			                    +"<td align='right'>￥"+re[i].CURRPRICE+"元</td>"
+			                    +"<td align='right'>"
+	                        	+"<input name='goods_number[43]' id='goods_number_43' value='"+re[i].QUANTITY+"' size='4' class='inputBg' style='text-align: center;' onkeydown='showdiv(this)' type='text' />"
+			                    +"</td>"
+			                    +"<td align='right'>￥"+re[i].CURRPRICE+"元</td>"
+			                    +"<td align='center'>"
+	                        	+"<a href='javascript:void(0)' class='f6' onclick='deletGood("+i+")'>删除</a>"
+	                    		+"</td>"
+	   	 						+"</tr>";
+							}
+						}
+						nobooks.innerHTML=ne;
+						meys.innerHTML="总计:￥"+may+"元";
+					}
+				});
+        	};
+        	function deletGood(bookname){//删除货物
+        		alert("bookname="+bookname);
+        		var booknames=msg[bookname].BID;
+        		$.ajax({//将cookie提交到后台存放
+					type:"POST",
+					url:getPath()+"/DeleShoppMsgServlet",
+					data:{"booknames":booknames,"uids":id},
+					dataType:"json",
+					success:function(re){
+						alert("操作:"+re.has+"!");
+						loCart();//调用以刷新页面
+					}
+				});
+        	}
+        </script>
+    </head>
+    <body onload="loCart()">
+        <div class="block clearfix" style="position: relative; height: 98px;">
+            <a href="#" name="top"><img class="logo" src="style/blue/images/logo_max.png" /></a>
+            <div id="topNav" class="clearfix">
+                <div style="float: left;"> 
+                    <font id="ECS_MEMBERZONE"><div id="append_parent"></div>
+                        欢迎光临本店&nbsp;
+                        <a href="#"> 登录</a>
+                        <a href="#">注册</a>
+                    </font>
+                </div>
+                <div style="float: right;">
+                    <a href="#">查看购物车</a>
+                </div>
+            </div>
+            <div id="mainNav" class="clearfix">
+                <a href="/JavaWebTest/index.html" class="cur">全部分类<span></span></a>
+                <a href="/JavaWebTest/index.html">JavaSE分类<span></span></a>
+                <a href="/JavaWebTest/index.html">JavaEE分类<span></span></a>
+                <a href="/JavaWebTest/index.html">JavaScript分类<span></span></a>
+            </div>
+        </div>
+
+
+        <div class="header_bg">
+
+            <div style="float: left; font-size: 14px; color:white; padding-left: 15px;">
+            </div>  
+
+            <form id="searchForm" method="get" action="#">
+                <input name="keywords" id="keyword" type="text" />
+                <input name="imageField" value=" " class="go" style="cursor: pointer; background: url('style/blue/images/sousuo.gif') no-repeat scroll 0% 0% transparent; width: 39px; height: 20px; border: medium none; float: left; margin-right: 15px; vertical-align: middle;" type="submit" />
+            </form>
+        </div>
+        <div class="blank"></div>
+        <div class="block">
+            <div class="flowBox">
+                <h6><span>商品列表</span></h6>
+                <form id="formCart">
+                    <table cellpadding="5" cellspacing="1">
+                        <tbody id="aa">
+                        	<tr>
+                                <th>商品名称</th>
+                                <th>本店价</th>
+                                <th>购买数量</th>
+                                <th>小计</th>
+                                <th>操作</th>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <a href="#" target="_blank"><img style="width: 80px; height: 80px;" src="style/blue/images/22722790-1_l.jpg" title="JavaScript" /></a><br />
+                                    <a href="#" target="_blank" class="f6">JavaScript</a>
+                                </td>
+                                <td align="right">￥40.00元</td>
+                                <td align="right">
+                                    <input name="goods_number[43]" id="goods_number_43" value="1" size="4" class="inputBg" style="text-align: center;" onkeydown="showdiv(this)" type="text" />
+                                </td>
+                                <td align="right">￥40.00元</td>
+                                <td align="center">
+                                    <a href="#" class="f6">删除</a>
+                                </td>
+                            </tr>
+                          	
+                        </tbody>
+                     </table>
+                    <table cellpadding="5" cellspacing="1">
+                        <tbody><tr>
+                                <td id="mey"> 总计:￥40.00元   </td>
+                                <td align="right">
+                                    <input value="清空购物车" class="bnt_blue_1"  type="button" />
+                                </td>
+                            </tr>
+                        </tbody></table>
+                    <input name="step" value="update_cart" type="hidden" />
+                </form>
+                <table cellpadding="5" cellspacing="0" width="99%">
+                    <tbody><tr>
+                            <td><a href="#"><img src="style/blue/images/continue.gif" alt="continue" /></a></td>
+                            <td align="right"><a href="#"><img src="style/blue/images/checkout.gif" alt="checkout" /></a></td>
+                        </tr>
+                    </tbody></table>
+            </div>
+            <div class="blank"></div>
+            <div class="blank5"></div>
+        </div>
+		<div class="blank"></div>
+        <iframe src="footer.html" frameborder="0" scrolling="no" width="100%" height="300"></iframe>
+    </body>
+</html>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jdld.dao.ManagedDao">
+    	<!-- 获取书本信息 -->
+    	<select id="findBookByUid" parameterType="java.util.Map" resultType="com.jdld.entity.Books">
+    		SELECT * FROM t_books 
+    		WHERE BID=#{ORDERITEMID,jdbcType=VARCHAR}
+    	</select>
+    	<!-- 根据UID找书本 -->
+   	    <select id="findShopp" parameterType="java.util.Map" resultType="com.jdld.entity.ShoppMsg">
+    		SELECT * FROM T_ORDERITEM WHERE ORDERITEMID=#{UID,jdbcType=VARCHAR}
+    	</select>
+    	<!-- 添加书本到购物车 -->
+		<insert id="insertBook" parameterType="com.jdld.entity.Books">
+    		insert into T_ORDERITEM 
+    		values( #{ORDERITEMID,jdbcType=CHAR}, #{QUANTITY,jdbcType=DOUBLE}, #{SUBTOTAL,jdbcType=DOUBLE}, #{BID,jdbcType=CHAR}, 
+    		#{BNAME,jdbcType=VARCHAR}, #{CURRPRICE,jdbcType=DOUBLE}, #{IMAGE_B,jdbcType=VARCHAR}, #{OID,jdbcType=CHAR}, #{HAS,jdbcType=CHAR})
+    	</insert>
+		<!-- 伪删除 -->
+    	<update id="deletShopp" parameterType="java.util.Map">
+    		UPDATE T_ORDERITEM 
+    		<set>
+	    		<if test="has !=null and has!=''">
+	    			HAS=#{has,jdbcType=VARCHAR}
+	    		</if>
+    		</set>
+    		WHERE BID=#{BOOKNAME,jdbcType=VARCHAR} AND ORDERITEMID=#{UID,jdbcType=VARCHAR}
+    	</update>
+</mapper>

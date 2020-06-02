@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jdld.dao.ManagedDao">
+	<!-- 获取书本信息 -->
+	<select id="findBook" parameterType="java.util.Map" resultType="com.jdld.entity.Books">
+		SELECT s.* FROM( SELECT rownum row_num,score.* FROM (select * from
+		T_BOOKS
+		<!-- 判断是否需要排序 -->
+		<if test="lookAllsql!=null and lookAllsql!='' and lookAllsql=='11'">
+				ORDER BY CURRPRICE ASC
+		</if>
+		<!-- 判断分页查找条件 -->
+		<where>
+			<if test="lookAllsql!=null and lookAllsql!='' and lookAllsql=='03'">
+				BNAME LIKE #{lookJs,jdbcType=VARCHAR}
+			</if>
+			<if test="lookAllsql!=null and lookAllsql!='' and lookAllsql=='04'">
+				AND BNAME LIKE #{lookTap,jdbcType=VARCHAR}
+			</if>
+		</where>
+		<!-- 判断是否需要排序 -->
+		<if test="hasChang !=null and hasChang !=''">
+				ORDER BY CURRPRICE ASC
+		</if>
+		) score ) s
+		WHERE s.row_num between #{BeginIndex,jdbcType=VARCHAR} and
+		#{EndIndex,jdbcType=VARCHAR}
+	</select>
+	
+	<!-- 获取页数信息 -->
+	<select id="findBookPageAll" parameterType="java.util.Map" resultType="java.lang.Integer">
+		SELECT COUNT(*) AS COUNT FROM t_books
+		<where>
+			<if test="lookAllsql!=null and lookAllsql!='' and lookAllsql=='03'">
+				BNAME LIKE #{lookJs,jdbcType=VARCHAR}
+			</if>
+			<if test="lookAllsql!=null and lookAllsql!='' and lookAllsql=='04'">
+				AND BNAME LIKE #{lookTap,jdbcType=VARCHAR}
+			</if>
+		</where>
+	</select>
+
+</mapper>

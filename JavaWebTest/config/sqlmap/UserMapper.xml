@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jdld.dao.ManagedDao">
+        	<!-- 在映射文件里配置sql语句 -->
+        	<!-- 通过id查询用户表的记录 -->
+        	<!-- 通过select执行查询
+        		id:标识映射文件中的sql,
+        		将来sql语句会封装到mappedStatement对象中,称为statement的id
+        		#{}:表示一个占位符
+        		parameterType:指定输入参数类型,对应数据库里的参数
+        		#{id}:表示我们接收的参数,参数名称就是id,如果输入参数是简单类型,#{}中的参数名可以任意
+        		resultType:返回sql输出结果的映射的java对象类型,select指定resultType表示将单条记录映射成的java对象
+        	 -->
+    	<select id="findManager" parameterType="java.util.Map" resultType="com.jdld.entity.Manager">
+    		SELECT IDU,LOGINNAME,LOGINPASS FROM T_USERS 
+    		WHERE LOGINNAME=#{username,jdbcType=VARCHAR} AND LOGINPASS=#{userkey,jdbcType=VARCHAR}
+    	</select>
+</mapper>

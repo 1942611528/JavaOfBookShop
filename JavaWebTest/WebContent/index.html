@@ -1,0 +1,422 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta name="Generator" content="YONGDA v1.0" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="Keywords" content="" />
+        <meta name="Description" content="" />
+        <title>熊大网上书城</title>
+        <link href="style/blue/main.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="/JavaWebTest/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript">
+	        function getPath(){//路径获取
+				var path = location.href;
+				var pname = location.pathname;
+				var index = path.indexOf(pname); 
+				var projectName =pname.substring(0,pname.indexOf("/", 1));
+				return path.substring(0,index)+projectName+"/";
+			};
+			var pag;//存放页数
+			var lists;//存放书本信息对象
+			var user;//存放用户名
+			var look=0;//存放搜索状态
+			var id;//用户名
+			var uids;//uid
+        	function lod(ii){//页面数据与下标
+        		var username=document.getElementById("cname");//显示用户名
+    			id=window.sessionStorage.getItem("username");
+    			uids=window.sessionStorage.getItem("uid");
+        		if(look==4){//获取输入搜索值
+        			var keyword=$('#keyword').val();
+        		}
+        		user=id;
+        		if(id!=null){
+        			username.innerHTML=id;
+        		}else{
+        			username.innerHTML="游客";
+        		}
+        		var currentPageNb=1;
+        		//alert("look="+look);
+        		$.ajax({//获取全部的数据
+					type:"POST",
+					url:getPath()+"/LookBookServlet",
+					data:{"currentPage":ii,"lookfor":look,"keyword":keyword},
+					dataType:"text",
+					success:function(data){
+						var list=JSON.parse(data);//遍历数组
+						lists=list;
+						var books="";//存放单个书本
+						var bookss="";//存放书本列
+						var nobook=0;//计算一页记录数
+						for(var i=0;i<list.length-1;i++){
+							var divs = document.getElementById("goodsBoxX");//将数据输出到指定位置
+							if(list[i]){
+								var names=list[i].BNAME.split("$")[0];
+							}else{
+								var names=list[i].BNAME;
+							}
+							books= "<div class='goodsItem'><a href='javascript:void(0)'><img src=\"style/blue/images/"+list[i].IMAGE_B+"\" alt=\""+names+"\" class='goodsimg'></a><br/>"
+                            +"<p><a href='javascript:void(0)' id='"+i+"' onclick='pagNo("+i+")'  title='"+names+"'>"+names+"</a></p>"//跳转指定页面 
+                            +"<font class='market_s'>￥"+list[i].PRICE+"元</font><br />"
+                            +"<font class='shop_s'>￥"+list[i].CURRPRICE+"元</font><br />"
+                            +"<a href='javascript:void(0)' onclick='cart("+i+")'><img src='style/blue/images/goumai.gif'></a> &nbsp;&nbsp;&nbsp;&nbsp;"
+                            +"<a href='javascript:void(0);'><img src='style/blue/images/shoucang.gif'></a>"
+                            +"</div>";
+                            nobook++;
+							bookss = bookss+books;
+						}
+						
+						var currentPage=list[list.length-1].BID;//获取页数信息
+						currentPageNb=Number(currentPage);//转换为int格式
+						var beginIndex=list[list.length-1].AUTHER;
+						var hasPrePage=list[list.length-1].BNAME;
+						var hasNextPage=list[list.length-1].PRESS;
+						var totalPage=list[list.length-1].PUBLISHTIME;
+						var totalPageNb=Number(totalPage);//转换为int格式
+						var totalCount=list[list.length-1].WORDNUM;
+						
+						var nobooks=document.getElementById("nobook");//设置信息数量
+						pag=nobook;
+						nobooks.innerHTML=nobook;
+						alert("当前页:"+currentPage+",起始:"+beginIndex+",总页数:"+totalPage+",是否有上一页:"+hasPrePage+",是否有下一页:"+hasNextPage+",总页数:"+totalCount);
+						divs.innerHTML=bookss;//添加到页面
+						
+						var totalPageNb=Number(totalPage);//根据totalPage即总页数显示下标
+						var pageLists=document.getElementById("pageList");
+						var hts="";
+						alert("totalPageNb="+totalPageNb);
+						if(totalPageNb>=10){//总页面数大于10页时
+							var start=beginIndex-5;
+							
+							var end=beginIndex+4;
+							//头溢出
+							if(start<1){
+								var start=1;
+								var end=10;
+							}
+							//尾溢出
+							if(end>totalPageNb){
+								var start=totalPageNb-9;
+								var end=totalPageNb;
+							}
+							//alert("start="+start);
+							//生成页码
+							for(var i=start;i<end+1;i++){
+								//alert("i="+i);
+								if(i==currentPageNb){
+									var ht="<a href='javascript:void(0)' onclick='return false' >["+i+"]</a>";
+								}else{
+									var ht="<a href='javascript:void(0)' id='"+look+"' onclick='lod("+i+")' class='page_now'>"+i+"</a>";
+								}
+								hts=hts+ht;
+								pageLists.innerHTML=hts;
+							}
+						}else{//页面小于10页时
+							for(var i=1;i<totalPageNb+1;i++){
+								if(i==currentPageNb){
+									var ht="<a href='javascript:void(0)' onclick='return false'>["+i+"]</a>";
+								}else{
+									var ht="<a href='javascript:void(0)' id='"+look+"' onclick='lod("+i+")' class='page_now'>"+i+"</a>";
+								}
+								hts=hts+ht;
+								pageLists.innerHTML=hts;
+							}
+						}
+					}
+				});
+        		look=0;//重置
+        		hestr();//历史揭记录加载
+        	};
+        	function getCookie(c_name){//获取cookie
+				if(document.cookie.length>0){
+					c_start=document.cookie.indexOf(c_name+"=")
+					if(c_start!=1){
+						c_start=c_start+c_name.length+1
+						c_end=document.cookie.indexOf(";",c_start)
+						if(c_end==-1)c_end=document.cookie.length
+						return unescape(document.cookie.substring(c_start,c_end))
+					}
+				}
+				return ""
+			};
+        	
+        	var hesId=0;
+        	var hestTe=0;//历史记录状态
+        	var hertHis=getCookie('hert');//要获取的cookie
+        	var newObject = JSON.parse(hertHis); //将cookie字符串转化成JSON数据
+        	var gethis=eval(newObject);//将cookie的json数据转换为数组
+			function pagNo(i){//点击书名跳转到其显示页面detail.html,同时将其添加到历史记录
+				var divi = document.getElementById(i);
+				var hest = new Array();//存放历史记录
+				//alert("bname="+lists[i].bname.split("$")[0]);
+				window.sessionStorage.setItem("user", user);
+				window.sessionStorage.setItem("image_w", lists[i].IMAGE_W);
+				window.sessionStorage.setItem("bname", lists[i].BNAME);
+				window.sessionStorage.setItem("currPrice", lists[i].CURRPRICE);
+				if(newObject){//如果存在阅览历史
+					alert("历史记录:"+gethis[0]);
+					if(gethis.length>0){//如果属于有元素
+						alert("有元素时lists="+lists[i].BNAME);
+						for(var i=0;i<gethis.length;i++){//先遍历是否有元素
+							var has=gethis[i];
+							if(has.bname==lists[i].BNAME){//存在相同元素时
+								gethis[i]=lists[i];//覆盖元素
+							}else{
+								gethis.push=lists[i];//添加元素
+							}
+						}
+					}else{//没有元素时,直接添加
+						alert("lists="+lists[i].BNAME);
+						hest[0]=lists[i];
+					}
+					alert("获取gethis="+gethis[0].BNAME);
+					window.location = "http://"+location.host+"/JavaWebTest/detail.html";//跳转到指定页面
+				}else{//如果没有历史记录时
+					hest[0]=lists[i];
+					var c=JSON.stringify(hest);
+					$.ajax({//将cookie提交到后台存放
+						type:"POST",
+						url:getPath()+"/HistoryServlet",
+						data:{"hestData":c,"hestType":hestTe,"ids":id},
+						dataType:"json",
+						success:function(re){
+							window.location = "http://"+location.host+"/JavaWebTest/detail.html";//跳转到指定页面
+						}
+					});
+				}
+				
+			};
+        	function hestr(){//历史揭记录加载
+        		if(newObject){//如果存在阅览历史
+        			//alert("newObject="+newObject);
+        			var hestrs="";//存放历史记录的列表
+        			var history=document.getElementById("history_list");//获取历史记录存放的div
+        			for(var i=0;i<gethis.length;i++){
+	        			var name=gethis[i].BNAME.split("$")[0];//获取名
+	    				var me=gethis[i].CURRPRICE;//获取价格
+	    				var img=gethis[i].IMAGE_B;//获取图片
+		        		var hestr="<ul class='clearfix'>"
+				                +"<li class='goodsimg'>"
+				                +"<a href='javascript:void(0)' target='_blank'>"
+				                +"<img src='style/blue/images/"+img+"' alt='飞利浦9@9v' class='B_blue'/>"
+				                +"</a>"
+				            	+"</li>"
+				            	+"<li>"
+				                +"<a href=javascript:void(0)#' target='_blank' title='Java就业培训教程'>"+name+"</a><br/>"
+				                +"本店售价：<font class='f1'>￥"+me+"元</font><br />"
+				                +"</li>"
+				        		+"</ul>";
+		        		hestrs+=hestr;
+        			}
+        		}
+        		history.innerHTML=hestrs;
+        	};
+			function looks(i){//搜索不同类型数据
+				if(i=="7"){//判断是否需要排序
+					look=look+""+i+"";
+					//alert("look="+look+",i="+i);
+				}else{
+					look=i;//获取点击状态值
+				}
+				
+				for(var is=0;is<4;is++){//控制按钮样式
+					var bulAll=document.getElementById(is);//获取所有按钮
+					bulAll.setAttribute("class","");
+				}
+				var bul=document.getElementById(i);//获取当前点击的按钮
+				bul.setAttribute("class","cur");
+				lod(1);
+			};
+			function cart(i){//添加购物车
+				alert("uids/cart="+uids+",lists[i]="+lists[i]+",i="+i);
+				var c=JSON.stringify(lists[i]);//将数组转换为字串
+				$.ajax({//将cookie提交到后台存放
+					type:"POST",
+					url:getPath()+"/ShoppingCartServlet",
+					data:{"listsTo":c,"ids":uids},
+					dataType:"json",
+					success:function(re){
+						alert("以为您添加到购物车!");
+						window.sessionStorage.setItem("ids", uids);//存放数据
+						window.location = "http://"+location.host+"/JavaWebTest/cart.html";//跳转到指定页面
+					}
+				});
+			};
+        </script>
+    </head>
+    <body onload="lod(1)">
+        <div class="block clearfix" style="position: relative; height: 98px;">
+            <a href="#" name="top"><img class="logo" src="style/blue/images/logo_max.png"></a>
+            <div id="topNav" class="clearfix">
+                <div style="float: left;"> 
+                    <font id="ECS_MEMBERZONE"><div id="append_parent"></div>
+                        <font  id="cname" class="f4_b" ></font>, 欢迎您回来！
+                        <a href="#">用户中心</a>
+                        <a href="#">退出</a>
+                    </font>
+                </div>
+                <div style="float: right;">
+                    <a href="#">查看购物车</a>
+                </div>
+            </div>
+            <div id="mainNav" class="clearfix">
+                <a href="javascript:void(0)" id="0" class="cur" onclick="looks(0)">全部分类<span></span></a>
+                <a href="javascript:void(0)" id="1" class="" onclick="looks(1)">JavaSE分类<span></span></a>
+                <a href="javascript:void(0)" id="2" class="" onclick="looks(2)">JavaEE分类<span></span></a>
+                <a href="javascript:void(0)" id="3" class="" onclick="looks(3)">JavaScript分类<span></span></a>
+            </div>
+        </div>
+
+        <div class="header_bg">
+            <div style="float: left; font-size: 14px; color:white; padding-left: 15px;">
+            </div>  
+
+            <form id="searchForm" method="get" enctype="multipart/form-data">
+                <input name="keywords" id="keyword" type="text" />
+                <input onclick="looks(4)" name="imageField" value=" " class="go" style="cursor: pointer; background: url('style/blue/images/sousuo.gif') no-repeat scroll 0% 0% transparent; width: 39px; height: 20px; border: medium none; float: left; margin-right: 15px; vertical-align: middle;" type="button" />
+            </form>
+        </div>
+        <div class="blank5"></div>
+        
+        <div class="block box">
+            <div class="blank"></div>
+           
+        </div>
+        <div class="blank"></div>
+
+        <div class="block box">
+
+        <div class="block clearfix">
+            <div class="AreaL">
+                <h3><span>商品分类</span></h3> 
+                <div id="category_tree" class="box_1">
+                    <dl>
+                        <dt><a href="#">全部分类</a></dt>
+                        <dd>       </dd>
+                    </dl>
+                    <dl>
+                        <dt><a href="#">JavaSE分类</a></dt>
+                        <dd>       </dd>
+                    </dl>
+                    <dl>
+                        <dt><a href="#">JavaEE分类</a></dt>
+                        <dd>       </dd>
+                    </dl>
+                    <dl>
+                        <dt><a href="#">JavaScript分类</a></dt>
+                        <dd>       </dd>
+                    </dl>
+
+                </div>
+                <div class="blank"></div><div style="display: block;" class="box" id="history_div">
+                    <h3><span>浏览历史</span></h3>
+                    <div class="box_1">
+
+                        <div class="boxCenterList clearfix" id="history_list">
+                        
+                            <ul class="clearfix">
+                                <li class="goodsimg">
+                                    <a href="#" target="_blank">
+                                        <img src="style/blue/images/8758723-1_l.jpg" alt="飞利浦9@9v" class="B_blue" />
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" target="_blank" title="Java就业培训教程">Java就业培训教程</a><br />
+                                    本店售价：<font class="f1">￥39.9元</font><br />
+                                </li>
+                            </ul>
+                            
+                            <ul class="clearfix">
+                                <li class="goodsimg">
+                                    <a href="#" target="_blank">
+                                        <img src="style/blue/images/8991366-1_l.jpg" alt="诺基亚E66" class="B_blue" />
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" target="_blank" title="Hibernate教程">Hibernate教程</a><br />
+                                    本店售价：<font class="f1">￥56.8元</font><br />
+                                </li>
+                            </ul>
+                            <ul id="clear_history">
+                                <a onclick="clear_history()">[清空]</a>
+                            </ul>  
+                        </div>
+                    </div>
+                </div>
+                <div class="blank5"></div>
+
+            </div>
+
+
+            <div class="AreaR">
+                <div class="blank"></div>
+                <div class="box">
+                    <div class="box_1">
+                        <h3>
+                            <span>商品列表</span>
+                            <form method="get" class="sort" name="listform">
+                                显示方式：
+                                <a href="#"><img src="style/blue/images/display_mode_list.gif" alt=""></a>
+                                <a href="#"><img src="style/blue/images/display_mode_grid_act.gif" alt=""></a>
+                                <a href="#"><img src="style/blue/images/display_mode_text.gif" alt=""></a>&nbsp;&nbsp;
+                                <a href="#"><img src="style/blue/images/goods_id_DESC.gif" alt="按上架时间排序"></a>
+                                <a href="#"><img src="style/blue/images/shop_price_default.gif" onclick="looks(7)" alt="按价格排序"></a>
+                                <a href="#"><img src="style/blue/images/last_update_default.gif" alt="按更新时间排序"></a>
+                                <input name="category" value="3" type="hidden" />
+                                <input name="display" value="grid" id="display" type="hidden" />
+                                <input name="brand" value="0" type="hidden" />
+                                <input name="price_min" value="0" type="hidden" />
+                                <input name="price_max" value="0" type="hidden" />
+                                <input name="filter_attr" value="0" type="hidden" />
+                                <input name="page" value="1" type="hidden" />
+                                <input name="sort" value="goods_id" type="hidden" />
+                                <input name="order" value="DESC" type="hidden" />
+                            </form>
+                        </h3>
+                        <form name="compareForm" action="" method="post" onsubmit="return compareGoods(this);">
+                            <div class="clearfix goodsBox" style="border: medium none; padding: 11px 0pt 10px 5px;" id="goodsBoxX">
+                                <div class="goodsItem">
+                                    <a href="#"><img src="style/blue/images/22788412-1_l.jpg" alt="Java Web开发详解" class="goodsimg"></a><br />
+                                    <p><a href="#" title="Java Web开发详解">Java Web开发详解</a></p>
+                                    <font class="market_s">￥68元</font><br />
+                                    <font class="shop_s">￥60元</font><br />
+                                    <a href="#"><img src="style/blue/images/goumai.gif"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="#;"><img src="style/blue/images/shoucang.gif"></a>
+                                </div>
+                                <div class="goodsItem">
+                                    <a href="#"><img src="style/blue/images/10_thumb_G_1242973436403.jpg" alt="索爱C702c" class="goodsimg"></a><br />
+                                    <p><a href="#" title="索爱C702c">索爱C702c</a></p>
+                                    <font class="market_s">￥1594元</font><br />
+                                    <font class="shop_s">￥1328元</font><br />
+                                    <a href="#"><img src="style/blue/images/goumai.gif"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <a href="#;"><img src="style/blue/images/shoucang.gif"></a>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+                <div class="blank5"></div>
+                
+                <form name="selectPageForm" action="/category.php" method="get">
+                    <div id="pager" class="pagebar">
+                        <span class="f_l " style="margin-right: 10px;">总计 <b id="nobook">12</b>  个记录</span>
+						<span id="pageList">
+							<a href="#" id="" onclick="pagNo()">[2]</a>
+							<a href="#" id="" onclick="pagNo()">3</a>
+							<a href="#" id="" onclick="pagNo()">4</a>
+						</span>
+                        <a class="next" href="#">下一页</a>    
+                    </div>
+                </form>
+                
+            </div>  
+
+        </div>
+
+        </div>
+
+        <div class="blank"></div>
+        <iframe src="footer.html" frameborder="0" scrolling="no" width="100%" height="300"></iframe>
+    </body>
+</html>

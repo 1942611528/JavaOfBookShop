@@ -1,0 +1,255 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="Description" content="" />
+        
+        <title>Java编程思想  -- 熊大书城</title>
+        
+        <link href="style/blue/main.css" rel="stylesheet" type="text/css" />
+        <script type="text/javascript" src="/JavaWebTest/jquery/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript">
+	         function lodOfDetail(){
+		        	var image_w=window.sessionStorage.getItem("image_w");//图片
+		        	document.getElementById("sim806035").src="style/blue/images/"+image_w;
+		        
+		        	var bname=window.sessionStorage.getItem("bname");//名字
+		        	var diviBname = document.getElementById("tata");
+		        	diviBname.innerHTML=bname.split("$")[0];
+		        
+		        	var currPrice=window.sessionStorage.getItem("currPrice");//价格
+		        	var diviCurrPrice = document.getElementById("ECS_SHOPPRICE");
+		        	diviCurrPrice.innerHTML="￥"+currPrice+"元";
+		        	//alert("image_w="+image_w+",bname="+bname.split("$")[0]+",currPrice="+"￥"+currPrice+"元");
+		        
+		        	var bname=window.sessionStorage.getItem("bname");//简介
+		        	var diviBname = document.getElementById("com_v");
+		        	diviBname.innerHTML=bname.split("$")[1];
+		        	
+		        	//var hest=window.sessionStorage.getItem("hest");//历史记录,在提交页面已经转类型了,所有不用再用JOSN.parse
+		        	//alert("hest="+hest);
+		        //用户名
+		        	/* var user=window.sessionStorage.getItem("user");
+		        	var diviBname = document.getElementById("append_parent");
+		        	if(user!=null){
+		        		diviBname.innerHTML=user;
+	        		}else{
+	        			diviBname.innerHTML="游客";
+	        		} */
+		        	hestr();
+		     };
+		     function getCookie(c_name){//获取cookie
+					if(document.cookie.length>0){
+						c_start=document.cookie.indexOf(c_name+"=")
+						if(c_start!=1){
+							c_start=c_start+c_name.length+1
+							c_end=document.cookie.indexOf(";",c_start)
+							if(c_end==-1)c_end=document.cookie.length
+							return unescape(document.cookie.substring(c_start,c_end))
+						}
+					}
+					return ""
+			}
+        	var hertHis=getCookie('hert');//要获取的cookie
+        	var newObject = JSON.parse(hertHis); //字符串转化成JSON数据
+        	var gethis=eval(newObject);
+        	function hestr(){//历史揭记录加载
+        		//var her=JSON.parse(hertHis);//字串转json
+        		alert("her="+gethis[0].BNAME.split("$")[0]);
+        		if(newObject){//如果存在阅览历史
+        			var hestrs="";//存放历史记录的列表
+        			var history=document.getElementById("history_list");//获取历史记录存放的div
+        			for(var i=0;i<gethis.length;i++){
+        				var name=gethis[i].BNAME.split("$")[0];//获取名
+	    				var me=gethis[i].CURRPRICE;//获取价格
+	    				var img=gethis[i].IMAGE_B;//获取图片
+	    				alert("name="+name+",me="+me+",img="+img);
+		        		var hestr="<ul class='clearfix'>"
+				                +"<li class='goodsimg'>"
+				                +"<a href='javascript:void(0)' target='_blank'>"
+				                +"<img src='style/blue/images/"+img+"' alt='飞利浦9@9v' class='B_blue'/>"
+				                +"</a>"
+				            	+"</li>"
+				            	+"<li>"
+				                +"<a href=javascript:void(0)#' target='_blank' title='Java就业培训教程'>"+name+"</a><br/>"
+				                +"本店售价：<font class='f1'>￥"+me+"元</font><br />"
+				                +"</li>"
+				        		+"</ul>";
+		        		hestrs+=hestr;
+        			}
+        		}
+        		history.innerHTML=hestrs;
+        	}
+    	</script>
+    </head>
+    <body onload="lodOfDetail()">
+        <div class="block clearfix" style="position: relative; height: 98px;">
+            <a href="#" name="top">
+                <img class="logo" src="style/blue/images/logo_max.png" />
+            </a>
+            <div id="topNav" class="clearfix">
+                <div style="float: left;"> 
+                    <font id="ECS_MEMBERZONE">
+                    	<div id="append_parent"></div>
+                        	欢迎光临本店&nbsp;
+                        <a href="#"> 登录</a>
+                        <a href="#">注册</a>
+                    </font>
+                </div>
+                <div style="float: right;">
+                    <a href="#">查看购物车</a>
+                </div>
+            </div>
+            <div id="mainNav" class="clearfix">
+                <a href="#">全部分类<span></span></a>
+                <a href="#"  class="cur">JavaSE分类<span></span></a>
+                <a href="#">JavaEE分类<span></span></a>
+                <a href="#">JavaScript分类<span></span></a>
+            </div>
+        </div>
+
+        <div class="header_bg">
+
+            <div style="float: left; font-size: 14px; color:white; padding-left: 15px;">
+            </div>
+            <form id="searchForm" method="get" >
+                <input name="keywords" id="keyword" type="text" />
+                <input name="imageField" value=" " class="go" style="cursor: pointer; background: url('style/blue/images/sousuo.gif') no-repeat scroll 0% 0% transparent; width: 39px; height: 20px; border: medium none; float: left; margin-right: 15px; vertical-align: middle;" type="submit" />
+            </form>
+        </div>
+        <div class="blank5"></div>
+        <div class="blank"></div>
+        <div class="block clearfix">
+            <div class="AreaL">
+                <h3><span>商品分类</span></h3> 
+                <div id="category_tree" class="box_1">
+                    <dl>
+                        <dt><a href="index.html">全部分类</a></dt>
+                        <dd>       </dd>
+                    </dl>
+                    <dl>
+                        <dt><a href="#">JavaSE分类</a></dt>
+                        <dd>       </dd>
+                    </dl>
+                    <dl>
+                        <dt><a href="#">JavaEE分类</a></dt>
+                        <dd>       </dd>
+                    </dl>
+                    <dl>
+                        <dt><a href="#">JavaScript分类</a></dt>
+                        <dd>       </dd>
+                    </dl>
+                </div>
+                <div class="blank"></div>
+
+                <div style="display: block;" class="box" id="history_div">
+                    <h3><span>浏览历史</span></h3>
+                    <div class="box_1">
+
+                        <div class="boxCenterList clearfix" id="history_list">
+                             <ul class="clearfix">
+                                <li class="goodsimg">
+                                    <a href="#" target="_blank">
+                                        <img src="style/blue/images/8758723-1_l.jpg" alt="飞利浦9@9v" class="B_blue" />
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" target="_blank" title="Java就业培训教程">Java就业培训教程</a><br />
+                                    本店售价：<font class="f1">￥39.9元</font><br />
+                                </li>
+                            </ul>
+                            <ul class="clearfix">
+                                <li class="goodsimg">
+                                    <a href="#" target="_blank">
+                                        <img src="style/blue/images/8991366-1_l.jpg" alt="诺基亚E66" class="B_blue" />
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" target="_blank" title="Hibernate教程">Hibernate教程</a><br />
+                                    本店售价：<font class="f1">￥56.8元</font><br />
+                                </li>
+                            </ul><ul id="clear_history"><a onclick="clear_history()">[清空]</a></ul>  </div>
+                    </div>
+                </div>
+                <div class="blank5"></div>
+            </div>
+
+            <div class="AreaR">
+                <div id="goodsInfo" class="clearfix">
+                    <div class="imgInfo">
+                            <img id="sim806035" src="style/blue/images/9317290-1_l.jpg" alt="Java编程思想" height="310px" width="310px;" />
+                    </div>
+                    <div class="textInfo">
+                        <form action="javascript:addToCart(9)" method="post" name="ECS_FORMBUY" id="ECS_FORMBUY">
+                            <div id="tata" class="clearfix" style="font-size: 14px; font-weight: bold; padding-bottom: 8px;">
+                                Java编程思想     
+                            </div>
+                            <ul>
+                                <li class="clearfix">
+                                    <dd>
+                                        <strong>商品货号：</strong>ECS000009      
+                                    </dd>
+                                </li> 
+                                <li class="clearfix">
+                                    <dd>
+                                        <strong>商品库存：</strong>
+                                        4 台             
+                                    </dd>
+                                </li>   
+                                <li class="clearfix">
+                                    <dd>
+                                        <strong>商品重量：</strong>121克       
+                                    </dd>
+                                </li>
+                                <li class="clearfix">
+                                    <dd>
+                                        <strong>上架时间：</strong>2009-05-06      
+                                    </dd>
+                                </li>
+                                <li class="clearfix">
+                                    <dd>
+                                        <strong>本店售价：</strong><font class="shop" id="ECS_SHOPPRICE">￥39.9元</font><br />
+                                    </dd>
+                                </li>
+                                <li class="clearfix">
+                                    <dd>
+                                        <strong>用户评价：</strong>
+                                        <img src="style/blue/images/stars5.gif" alt="comment rank 5">
+                                    </dd>
+                                </li>
+                                <li class="clearfix">
+                                    <dd>
+                                        <strong>购买数量：</strong>
+                                        <input name="number" id="number" value="1" size="4" onblur="changePrice()" style="border: 1px solid rgb(204, 204, 204);" type="text" />
+                                    </dd>
+                                </li>
+                                <li class="padd">
+                                    <a href="#"><img src="style/blue/images/goumai2.gif"></a>
+                                    <a href="#"><img src="style/blue/images/shoucang2.gif"></a>
+                                </li>
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+                <div class="blank"></div>
+                <div class="box">
+                    <div class="box_1">
+                        <h3 style="padding: 0pt 5px;">
+                            <div id="com_b" class="history clearfix">
+                                <h2 style="cursor: pointer;">商品描述：</h2>
+                            </div>
+                        </h3>
+                        <div id="com_v" class="boxCenterList RelaArticle">
+                            <p>很好的一本Java入门书</p>
+                            <p>&nbsp;</p>
+                        </div>
+                <div class="blank"></div>
+                   </div>
+            </div>
+			
+        </div>
+        <div class="blank"></div>
+        <iframe src="footer.html" frameborder="0" scrolling="no" width="100%" height="300"></iframe>
+        
+    </body>
+</html>
